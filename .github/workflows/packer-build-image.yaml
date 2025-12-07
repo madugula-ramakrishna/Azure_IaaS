@@ -20,7 +20,7 @@ jobs:
         with:
           packer_version: 1.11.2
 
-      # Login to Azure using Service Principal
+      # Login to Azure using Service Principal update variables
       - name: Azure Login
         uses: azure/login@v2
         with:
