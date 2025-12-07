@@ -38,7 +38,7 @@ source "azure-arm" "ubuntu" {
   image_publisher                    = "Canonical"
   image_offer                        = "UbuntuServer"
   image_sku                          = "18.04-LTS"
-  managed_image_resource_group_name  = "AzureDevOps"  # Must exist and have 'madugula' tag
+  managed_image_resource_group_name  = "AzureDevOps"  # existing RG
   managed_image_name                 = "udacity-packager-image-v1"
   location                           = "westeurope"
   vm_size                             = "Standard_B1s"
