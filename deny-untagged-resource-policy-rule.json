@@ -1,0 +1,26 @@
+{
+  "properties": {
+    "displayName": "Deny resource creation without required tag",
+    "policyType": "Custom",
+    "mode": "All",
+    "description": "Denies creation of resources that do not have the required tag.",
+    "parameters": {
+      "tagName": {
+        "type": "String",
+        "metadata": {
+          "displayName": "madugula",
+          "description": "Name of the tag that must be present."
+        }
+      }
+    },
+    "policyRule": {
+      "if": {
+        "field": "[concat('tags[', parameters('tagName'), ']')]",
+        "exists": "false"
+      },
+      "then": {
+        "effect": "deny"
+      }
+    }
+  }
+}
