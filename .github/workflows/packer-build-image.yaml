@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - ""
+      - "*"
 
 jobs:
   build-packer-image:
@@ -20,21 +20,15 @@ jobs:
         with:
           packer_version: 1.11.2
 
-      # Login to Azure
+      # Login to Azure using Service Principal
       - name: Azure Login
         uses: azure/login@v2
         with:
-          auth-type: SERVICE_PRINCIPAL
-                  with:
           auth-type: SERVICE_PRINCIPAL
           client-id: ${{ secrets.ARM_CLIENT_ID }}
           tenant-id: ${{ secrets.ARM_TENANT_ID }}
           subscription-id: ${{ secrets.ARM_SUBSCRIPTION_ID }}
           client-secret: ${{ secrets.ARM_CLIENT_SECRET }}
-          
-      # Create resource group
-      #- name: Create Resource group
-      #  run: az group create --name rg-packer-image --location northeurope
 
       # Export environment variables for Packer
       - name: Set Packer Environment Variables
@@ -48,10 +42,10 @@ jobs:
           echo "PKR_VAR_tenant_id=${{ secrets.ARM_TENANT_ID }}" >> $GITHUB_ENV
           echo "PKR_VAR_subscription_id=${{ secrets.ARM_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
 
-      # Init Packer template
+      # Initialize Packer template
       - name: Initialize Packer Template
         run: packer init server.pkr.hcl
-        
+
       # Build Packer template
       - name: Build Packer Template
         run: packer build server.pkr.hcl
