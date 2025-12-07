@@ -1,51 +1,49 @@
-name: Build Azure Packer Image
-
-on:
-  workflow_dispatch:
-  push:
-    paths:
-      - "*"
-
-jobs:
-  build-packer-image:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      # Install Packer
-      - name: Install Packer
-        uses: hashicorp/setup-packer@v2
-        with:
-          packer_version: 1.11.2
-
-      # Login to Azure
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          auth-type: SERVICE_PRINCIPAL
-          client-id: ${{ secrets.ARM_CLIENT_ID }}
-          tenant-id: ${{ secrets.ARM_TENANT_ID }}
-          subscription-id: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-          client-secret: ${{ secrets.ARM_CLIENT_SECRET }}
-
-      # Set Packer environment variables
-      - name: Set Packer Environment Variables
-        run: |
-          echo "ARM_CLIENT_ID=${{ secrets.ARM_CLIENT_ID }}" >> $GITHUB_ENV
-          echo "ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}" >> $GITHUB_ENV
-          echo "ARM_SUBSCRIPTION_ID=${{ secrets.ARM_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-          echo "ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}" >> $GITHUB_ENV
-          echo "PKR_VAR_client_id=${{ secrets.ARM_CLIENT_ID }}" >> $GITHUB_ENV
-          echo "PKR_VAR_client_secret=${{ secrets.ARM_CLIENT_SECRET }}" >> $GITHUB_ENV
-          echo "PKR_VAR_tenant_id=${{ secrets.ARM_TENANT_ID }}" >> $GITHUB_ENV
-          echo "PKR_VAR_subscription_id=${{ secrets.ARM_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-
-      # Initialize Packer template
-      - name: Initialize Packer Template
-        run: packer init server.pkr.hcl
-
-      # Build Packer template
-      - name: Build Packer Template
-        run: packer build server.pkr.hcl
+{
+	"variables": {
+		"client_id": "{{env `ARM_CLIENT_ID`}}",
+		"client_secret": "{{env `ARM_CLIENT_SECRET`}}",
+		"subscription_id": "{{env `ARM_SUBSCRIPTION_ID`}}",
+		"tenant_id": "{{env `ARM_TENANT_ID`}}"
+	},
+	"builders": [{
+		"type": "azure-arm",
+		"client_id": "{{user `client_id`}}",
+		"client_secret": "{{user `client_secret`}}",
+		"subscription_id": "{{user `subscription_id`}}",
+		"tenant_id": "{{user `tenant_id`}}",
+		"os_type": "Linux",
+		"image_publisher": "Canonical",
+		"image_offer": "UbuntuServer",
+		"image_sku": "18.04-LTS",
+		"managed_image_resource_group_name": "Azuredevops",
+		"managed_image_name": "udacity-packager-image-v1",
+		"location": "westeurope",
+		"vm_size": "Standard_B1s"
+	}],
+	"provisioners": [{
+		"inline": [
+			"sudo mkdir -p /var/www/html",
+			"sudo echo 'Hello, World!' > /var/www/html/index.html",
+			"echo '[Unit]' > http.service",
+			"echo 'Description=HTTP Hello World' >> http.service",
+			"echo 'After=network.target' >> http.service",
+			"echo 'StartLimitIntervalSec=0' >> http.service",
+			"echo '[Service]' >> http.service",
+			"echo 'Type=simple' >> http.service",
+			"echo 'Restart=always' >> http.service",
+			"echo 'RestartSec=1' >> http.service",
+			"echo 'ExecStart=/bin/busybox httpd -f -p 80 -h /var/www/html' >> http.service",
+			"echo '[Install]' >> http.service",
+			"echo 'WantedBy=multi-user.target' >> http.service",
+			"sudo mv http.service /etc/systemd/system",
+			"sudo chown root:root /etc/systemd/system/http.service",
+			"sudo chmod 755 /etc/systemd/system/http.service",
+			"sudo systemctl daemon-reload",
+			"sudo systemctl enable http",
+			"sudo systemctl start http"
+		],
+		"inline_shebang": "/bin/sh -x",
+		"type": "shell",
+		"execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E sh '{{ .Path }}'"
+	}]
+}
