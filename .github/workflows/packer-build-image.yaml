@@ -3,7 +3,7 @@ name: Build Azure Packer Image
 permissions:
   id-token: write
   contents: read
-  
+
 on:
   workflow_dispatch:
   push:
@@ -24,12 +24,20 @@ jobs:
         with:
           version: 1.11.2
 
-      # Login to Azure using Service Principal update variables
+      # Login to Azure using Service Principal
       - name: Azure Login
         uses: azure/login@v2
         with:
           auth-type: SERVICE_PRINCIPAL
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Create temporary resource group for Packer build VM
+      - name: Create Packer temporary RG
+        run: |
+          az group create \
+            --name pkr-build-rg \
+            --location westeurope \
+            --tags madugula=true
 
       # Export SP credentials for Packer
       - name: Set Packer Environment Variables
@@ -46,3 +54,7 @@ jobs:
       # Build Packer template
       - name: Build Packer Template
         run: packer build server.pkr.hcl
+
+      # Cleanup temporary resource group
+      - name: Delete Packer temporary RG
+        if: always()   # ensures cleanup even if the build fails
