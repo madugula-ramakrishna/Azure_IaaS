@@ -43,6 +43,10 @@ jobs:
           echo "ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}" >> $GITHUB_ENV
           echo "ARM_SUBSCRIPTION_ID=${{ secrets.ARM_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
           echo "ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}" >> $GITHUB_ENV
+          echo "PKR_VAR_client_id=${{ secrets.ARM_CLIENT_ID }}" >> $GITHUB_ENV
+          echo "PKR_VAR_client_secret=${{ secrets.ARM_CLIENT_SECRET }}" >> $GITHUB_ENV
+          echo "PKR_VAR_tenant_id=${{ secrets.ARM_TENANT_ID }}" >> $GITHUB_ENV
+          echo "PKR_VAR_subscription_id=${{ secrets.ARM_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
 
       # Init Packer template
       - name: Initialize Packer Template
