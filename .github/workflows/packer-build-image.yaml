@@ -58,3 +58,9 @@ jobs:
       # Cleanup temporary resource group
       - name: Delete Packer temporary RG
         if: always()   # ensures cleanup even if the build fails
+                if: always()   # ensures cleanup even if the build fails
+        run: |
+          az group delete \
+            --name pkr-build-rg \
+            --yes \
+            --no-wait
