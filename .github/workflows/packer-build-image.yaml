@@ -1,0 +1,48 @@
+name: Build Azure Packer Image
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ""
+
+jobs:
+  build-packer-image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Install Packer
+      - name: Install Packer
+        uses: hashicorp/setup-packer@v2
+        with:
+          packer_version: 1.11.2
+
+      # Login to Azure
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          auth-type: SERVICE_PRINCIPAL
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
+      # Create resource group
+      #- name: Create Resource group
+      #  run: az group create --name rg-packer-image --location northeurope
+
+      # Export environment variables for Packer
+      - name: Set Packer Environment Variables
+        run: |
+          echo "ARM_CLIENT_ID=${{ secrets.ARM_CLIENT_ID }}" >> $GITHUB_ENV
+          echo "ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}" >> $GITHUB_ENV
+          echo "ARM_SUBSCRIPTION_ID=${{ secrets.ARM_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+          echo "ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}" >> $GITHUB_ENV
+
+      # Init Packer template
+      - name: Initialize Packer Template
+        run: packer init server.pkr.hcl
+        
+      # Build Packer template
+      - name: Build Packer Template
+        run: packer build server.pkr.hcl

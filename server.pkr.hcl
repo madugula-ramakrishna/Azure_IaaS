@@ -40,7 +40,7 @@ source "azure-arm" "ubuntu" {
   image_sku                   = "18.04-LTS"
   managed_image_resource_group_name = "Azuredevops"
   managed_image_name          = "udacity-packager-image-v1"
-  location                    = "northeurope"
+  location                    = "westeurope"
   vm_size                     = "Standard_B1s"
 }
 
