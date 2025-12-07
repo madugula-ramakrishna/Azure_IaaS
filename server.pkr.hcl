@@ -69,7 +69,6 @@ build {
 	  "sudo systemctl daemon-reload",
       "sudo systemctl enable http",
 	  "sudo systemctl start http"
-      "sudo systemctl status http"
     ]
     inline_shebang = "/bin/sh -x"
     execute_command = "chmod +x {{ .Path }}; {{ .Vars }} sudo -E sh '{{ .Path }}'"
