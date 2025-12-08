@@ -8,11 +8,11 @@ provider "azurerm" {
 
 data "azurerm_image" "packer_image" {
   name                = "udacity-packager-image-v1"
-  resource_group_name = "Azuredevops"
+  resource_group_name = "cloud-demo"
 }
 
 data "azurerm_resource_group" "main" {
-  name     = "Azuredevops"
+  name     = "cloud-demo"
 }
 
 resource "azurerm_virtual_network" "main" {

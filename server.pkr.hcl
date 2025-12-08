@@ -38,7 +38,7 @@ source "azure-arm" "ubuntu" {
   image_publisher             = "Canonical"
   image_offer                 = "UbuntuServer"
   image_sku                   = "18.04-LTS"
-  managed_image_resource_group_name = "Azuredevops"
+  managed_image_resource_group_name = "cloud-demo"
   managed_image_name          = "udacity-packager-image-v1"
   location                    = "northeurope"
   vm_size                     = "Standard_B1s"
